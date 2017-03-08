@@ -12,15 +12,26 @@ public class ImransFirstSceneScript : MonoBehaviour {
     void Update () {
         var MySphere = GameObject.Find("Sphere");
         var MySphereTransform = MySphere.transform;
-        //MySphereTransform.Translate()
-	}
+
+        var myGVRPointer = GameObject.Find("Main Camera").GetComponent<GvrPointerPhysicsRaycaster>();
+        Debug.logger.Log(myGVRPointer);
+
+
+    }
 
     // Update is called once per physics engine call, usually before update
     private void FixedUpdate()
     {
-        // update all the forces we want to...
         var mySphere = GameObject.Find("Sphere");
         var theRigidBody = mySphere.GetComponent<Rigidbody>();
+
+        // see if the controller is looking at us and has the button pushed.
+        var contOrientation = GvrController.Orientation;
+        
+        //Debug.logger.Log(contOrientation);
+
+
+        // update all the forces we want to...
         if (mySphere.transform.position.y < 0.51)
             theRigidBody.AddForce(0, 300, 0, ForceMode.Acceleration);
     }
