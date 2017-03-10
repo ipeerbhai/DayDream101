@@ -9,15 +9,25 @@ public class ImransFirstSceneScript : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
-        var MySphere = GameObject.Find("Sphere");
+    void Update ()
+    {
+        // find the bouncing sphere from inside this central game object.
+        var MySphere = GameObject.Find("Sphere"); // Can skip getting if this script component is attached to the GameObject that will be the target.
         var MySphereTransform = MySphere.transform;
 
+        // find the controller and get its position.
+        var controllerPointer = GameObject.Find("GvrControllerPointer");
+        var controllerTransform = controllerPointer.transform;
 
-        //var myGVRPointer = GameObject.Find("Main Camera").GetComponent<GvrPointerPhysicsRaycaster>();
-        //Debug.logger.Log(myGVRPointer);
-
-
+        // use the controller orientation quaternion and get a forward pointing vector from it, then raycast.
+        Vector3 fwd = GvrController.Orientation * Vector3.forward;
+        RaycastHit pointingAtWhat;
+        if (Physics.Raycast(controllerTransform.position, fwd, out pointingAtWhat) )
+        {
+            var theTextGameObject = GameObject.Find("txtMainData");
+            UnityEngine.UI.Text theTextComponent = theTextGameObject.GetComponent<UnityEngine.UI.Text>();
+            theTextComponent.text = "hit " + pointingAtWhat.collider.name;
+        }
     }
 
     // Update is called once per physics engine call, usually before update

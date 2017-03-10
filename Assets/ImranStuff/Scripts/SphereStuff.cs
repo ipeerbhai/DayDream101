@@ -29,10 +29,12 @@ public class SphereStuff : MonoBehaviour, IGvrPointerHoverHandler, IPointerEnter
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        Debug.logger.Log(eventData);
 
     }
 
     public void OnGvrPointerHover(PointerEventData eventData)
     {
+        Debug.logger.Log(eventData);
     }
 }
