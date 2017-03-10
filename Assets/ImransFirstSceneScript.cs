@@ -13,8 +13,9 @@ public class ImransFirstSceneScript : MonoBehaviour {
         var MySphere = GameObject.Find("Sphere");
         var MySphereTransform = MySphere.transform;
 
-        var myGVRPointer = GameObject.Find("Main Camera").GetComponent<GvrPointerPhysicsRaycaster>();
-        Debug.logger.Log(myGVRPointer);
+
+        //var myGVRPointer = GameObject.Find("Main Camera").GetComponent<GvrPointerPhysicsRaycaster>();
+        //Debug.logger.Log(myGVRPointer);
 
 
     }
