@@ -14,6 +14,9 @@ public class ImransFirstSceneScript : MonoBehaviour {
         // let's move the camera when the user pushes the controller "click" button.
         if (GvrController.ClickButton)
         {
+            var theTextGameObject = GameObject.Find("txtMainData");
+            UnityEngine.UI.Text theTextComponent = theTextGameObject.GetComponent<UnityEngine.UI.Text>();
+            theTextComponent.text = "You have clicked!";
             var camera = GameObject.Find("Main Camera");
             camera.transform.position += (Vector3.forward * Time.deltaTime) * m_forwardSpeed; // using deltatime means I'm moving at 1 meter/s
         }
