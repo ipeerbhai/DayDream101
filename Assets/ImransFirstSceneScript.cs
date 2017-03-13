@@ -1,31 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Assets.ImranStuff.Scripts;
 
 public class ImransFirstSceneScript : MonoBehaviour
 {
     private float m_forwardSpeed = 3.0f;
     private float m_rotationSpeed = 10.0f;
 
+    static private MicrophoneManagerForUnity m_MicManager = null;
+
     private string m_RecordingDevice;
 
     // Use this for initialization
     void Start()
     {
-        // let's figure out how to record sound in Unity.
-        foreach (string micDevice in Microphone.devices)
-        {
-            m_RecordingDevice = micDevice;
-        }
-
-        //Microphone.Start(m_RecordingDevice, false, 15, 16000);
-
+        if (m_MicManager == null)
+            m_MicManager = new MicrophoneManagerForUnity();
     }
 
     // Update is called once per frame
     void Update()
     {
         float deadZone = 0.15f;
+        m_MicManager.Pulse(Time.deltaTime);
 
         // put some debug output into the world.
         var theTextGameObject = GameObject.Find("txtMainData");
