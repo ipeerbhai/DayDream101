@@ -34,6 +34,7 @@ public class ImransFirstSceneScript : MonoBehaviour
             if (m_MicManager.Update())
             {
                 // we have information back from the cloud.
+                b_IsRunningTask = false;
             }
         }
 
