@@ -24,7 +24,7 @@ namespace Assets.ImranStuff.Scripts
             httpWebRequest.SendChunked = true;
             httpWebRequest.Accept = @"text/plain";
             httpWebRequest.Method = "POST";
-            httpWebRequest.Headers["Authorization"] = "SMe75ff0bdf59cdc3c7106aaad84e7f16a";
+            httpWebRequest.Headers["Authorization"] = "SMe75ff0bdf59cdc3c7106aaad84e7f16a"; // Test API key
             httpWebRequest.ProtocolVersion = HttpVersion.Version11;
 
             // make the request, stream the chunks.
