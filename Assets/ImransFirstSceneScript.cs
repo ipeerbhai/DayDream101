@@ -6,24 +6,36 @@ using Assets.ImranStuff.Scripts;
 public class ImransFirstSceneScript : MonoBehaviour
 {
     private float m_forwardSpeed = 3.0f;
-    private float m_rotationSpeed = 10.0f;
-
+    private bool b_IsRunningTask;
     static private MicrophoneManagerForUnity m_MicManager = null;
-
-    private string m_RecordingDevice;
 
     // Use this for initialization
     void Start()
     {
         if (m_MicManager == null)
             m_MicManager = new MicrophoneManagerForUnity();
+        b_IsRunningTask = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        float deadZone = 0.15f;
-        m_MicManager.Pulse(Time.deltaTime);
+        //float deadZone = 0.15f; // used for the Gvr input touchpad.
+        if ((GvrController.AppButton) || (Input.GetKey(KeyCode.Space)))
+            m_MicManager.Pulse(Time.deltaTime);
+
+        if ((GvrController.AppButtonUp) || (Input.GetKeyUp(KeyCode.Space)))
+        {
+            m_MicManager.Start();
+            b_IsRunningTask = true;
+        }
+        if (b_IsRunningTask)
+        {
+            if (m_MicManager.Update())
+            {
+                // we have information back from the cloud.
+            }
+        }
 
         // put some debug output into the world.
         var theTextGameObject = GameObject.Find("txtMainData");
@@ -31,6 +43,9 @@ public class ImransFirstSceneScript : MonoBehaviour
         var player = GameObject.Find("Player");
         var camera = GameObject.Find("Main Camera");
 
+        player.transform.rotation = camera.transform.rotation;
+
+        /*  Should probaby remove this and use the main camera.orientation?
         // let's rotate the camera.
         if (GvrController.IsTouching)
         {
@@ -45,12 +60,13 @@ public class ImransFirstSceneScript : MonoBehaviour
                 player.transform.Rotate(0, 1 * Time.deltaTime * m_rotationSpeed, 0);
             }
         }
+        */
 
         // let's move the camera when the user pushes the controller "click" button.
         if (GvrController.ClickButton)
         {
             // let's translate the camera forward
-            player.transform.position += (player.transform.rotation * Vector3.forward * Time.deltaTime) * m_forwardSpeed; // using deltatime means I'm moving at 1 meter/s
+            player.transform.position += (camera.transform.rotation * Vector3.forward * Time.deltaTime) * m_forwardSpeed; // using deltatime means I'm moving at 1 meter/s
         }
     }
 
