@@ -5,36 +5,62 @@ using Assets.ImranStuff.Scripts;
 
 public class ImransFirstSceneScript : MonoBehaviour
 {
+    private int m_RequestedRecordingSeconds = 20;
+    static private string m_RecordingDevice = "";
+    private AudioClip m_AudioSample = null;
+
     private float m_forwardSpeed = 3.0f;
-    private bool b_IsRunningTask;
+    private bool m_IsRunningTask;
     static private MicrophoneManagerForUnity m_MicManager = null;
 
     // Use this for initialization
     void Start()
     {
+        foreach (string micDevice in Microphone.devices)
+        {
+            m_RecordingDevice = micDevice;
+        }
+
         if (m_MicManager == null)
             m_MicManager = new MicrophoneManagerForUnity();
-        b_IsRunningTask = false;
+        m_IsRunningTask = false;
     }
 
     // Update is called once per frame
     void Update()
     {
         //float deadZone = 0.15f; // used for the Gvr input touchpad.
+        if ((GvrController.AppButtonDown) || (Input.GetKeyDown(KeyCode.Space)))
+        {
+            m_AudioSample = Microphone.Start(m_RecordingDevice, false, m_RequestedRecordingSeconds, 16000);
+            m_MicManager.ClipStart();
+        }
         if ((GvrController.AppButton) || (Input.GetKey(KeyCode.Space)))
-            m_MicManager.Pulse(Time.deltaTime);
+        {
+            if (!Microphone.IsRecording(m_RecordingDevice))
+            {
+                m_MicManager.ConsolidateClips(m_AudioSample, m_AudioSample.samples);
+                m_AudioSample = Microphone.Start(m_RecordingDevice, false, m_RequestedRecordingSeconds, 16000);
+                m_MicManager.ClipStart();
+            }
 
+        }
         if ((GvrController.AppButtonUp) || (Input.GetKeyUp(KeyCode.Space)))
         {
+            int recordingPosition = Microphone.GetPosition(m_RecordingDevice); // have to know this before we end, or the API will zero out.
+            Microphone.End(m_RecordingDevice);
+            m_MicManager.ConsolidateClips(m_AudioSample, recordingPosition);
             m_MicManager.Start();
-            b_IsRunningTask = true;
+            m_IsRunningTask = true; // job management on a heavyweight thread.
         }
-        if (b_IsRunningTask)
+
+        if (m_IsRunningTask)
         {
             if (m_MicManager.Update())
             {
-                // we have information back from the cloud.
-                b_IsRunningTask = false;
+                // we have information back from the MicManager.
+                Debug.logger.Log("All done!");
+                m_IsRunningTask = false;
             }
         }
 

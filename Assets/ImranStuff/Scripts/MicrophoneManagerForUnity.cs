@@ -10,11 +10,11 @@ namespace Assets.ImranStuff.Scripts
 {
     public class MicrophoneManagerForUnity : ThreadedJob
     {
+        public bool ShouldRecord { get; set; }
         static public bool IsInited = false;
         static private string m_RecordingDevice = "";
-        private AudioClip m_AudioSample = null;
-        private int m_RequestedRecordingSeconds = 1;
         private MemoryStream m_clipMemory = null;
+        private bool m_DidConsolidate = false;
 
         //--------------------------------------------------------------------------------------------------------------------------------
         public MicrophoneManagerForUnity()
@@ -22,6 +22,7 @@ namespace Assets.ImranStuff.Scripts
             // check initialization and initialize if needed.
             if (!IsInited)
             {
+                ShouldRecord = false;
                 // let's figure out how to record sound in Unity.
                 foreach (string micDevice in Microphone.devices)
                 {
@@ -32,47 +33,46 @@ namespace Assets.ImranStuff.Scripts
         }
 
         //--------------------------------------------------------------------------------------------------------------------------------
+        public void ClipStart()
+        {
+            m_DidConsolidate = false;
+        }
+        //--------------------------------------------------------------------------------------------------------------------------------
         protected override void ThreadFunction()
         {
             while (m_clipMemory == null)
             {
                 System.Threading.Thread.Sleep(100);
             }
+
             MemoryStream cloudFormattedStream = createWaveFileStream(m_clipMemory);
             AITransactionHandler AITransact = new AITransactionHandler();
             AITransact.SendDataToCloud(cloudFormattedStream);
+
         }
 
         //--------------------------------------------------------------------------------------------------------------------------------
-        public void Pulse(float deltaTime)
+        public bool ConsolidateClips(AudioClip inputClip, int samplePosition)
         {
-            int recordingPosition = 0;
-            if (Microphone.IsRecording(m_RecordingDevice))
+            if (
+                (inputClip != null) && 
+                (inputClip.length > 0) &&
+                (!m_DidConsolidate)
+                )
             {
-                recordingPosition = Microphone.GetPosition(m_RecordingDevice);
+                if (m_clipMemory == null)
+                    m_clipMemory = new MemoryStream();
+                float[] data = new float[inputClip.samples];
+                inputClip.GetData(data, 0);
+                for (int i = 0; i <= samplePosition; i++)
+                {
+                    Int16 thisSampleAsPCM = (Int16)(data[i] * Int16.MaxValue);
+                    byte[] sampleBytes = BitConverter.GetBytes(thisSampleAsPCM);
+                    m_clipMemory.Write(sampleBytes, 0, sampleBytes.Length);
+                }
+                m_DidConsolidate = true;
             }
-            else
-            {
-                m_AudioSample = Microphone.Start(m_RecordingDevice, false, m_RequestedRecordingSeconds, 16000);
-            }
-
-            if (m_AudioSample.length == m_RequestedRecordingSeconds)
-                ConsolidateClips();
-        }
-
-        //--------------------------------------------------------------------------------------------------------------------------------
-        private void ConsolidateClips()
-        {
-            if (m_clipMemory == null)
-                m_clipMemory = new MemoryStream();
-            float[] data = new float[m_AudioSample.samples];
-            m_AudioSample.GetData(data, 0);
-            for (int i = 0; i < data.Length; i++)
-            {
-                Int16 thisSampleAsPCM = (Int16)(data[i] * Int16.MaxValue);
-                byte[] sampleBytes = BitConverter.GetBytes(thisSampleAsPCM);
-                m_clipMemory.Write(sampleBytes, 0, sampleBytes.Length);
-            }
+            return (m_DidConsolidate);
         }
 
         //--------------------------------------------------------------------------------------------------------------------------------
