@@ -32,6 +32,7 @@ public class ImransFirstSceneScript : MonoBehaviour
         //float deadZone = 0.15f; // used for the Gvr input touchpad.
         if ((GvrController.AppButtonDown) || (Input.GetKeyDown(KeyCode.Space)))
         {
+            m_MicManager.Clear();
             m_AudioSample = Microphone.Start(m_RecordingDevice, false, m_RequestedRecordingSeconds, 16000);
             m_MicManager.ClipStart();
         }

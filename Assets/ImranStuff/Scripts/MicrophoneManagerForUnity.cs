@@ -48,7 +48,15 @@ namespace Assets.ImranStuff.Scripts
             MemoryStream cloudFormattedStream = createWaveFileStream(m_clipMemory);
             AITransactionHandler AITransact = new AITransactionHandler();
             AITransact.SendDataToCloud(cloudFormattedStream);
-
+        }
+        //--------------------------------------------------------------------------------------------------------------------------------
+        public void Clear()
+        {
+            if (m_clipMemory != null)
+            {
+                m_clipMemory.Dispose();
+                m_clipMemory = null;
+            }
         }
 
         //--------------------------------------------------------------------------------------------------------------------------------
