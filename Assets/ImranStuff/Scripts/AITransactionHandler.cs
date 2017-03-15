@@ -14,7 +14,7 @@ namespace Assets.ImranStuff.Scripts
         public void SendDataToCloud(MemoryStream waveData)
         {
             // We need to make an HTTP Request to a URI and send the chunked wavstream.
-            string requestUri = @"http://127.0.0.1:3000/v1/GetLanguageModel";
+            string requestUri = @"http://192.168.1.13:3000/v1/GetLanguageModel";
             string responseString = "";
             string contentType = @"audio/x-wav;codec=pcm;bit=16;rate=16000";
 

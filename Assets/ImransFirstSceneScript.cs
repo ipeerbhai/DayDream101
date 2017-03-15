@@ -71,8 +71,6 @@ public class ImransFirstSceneScript : MonoBehaviour
         var player = GameObject.Find("Player");
         var camera = GameObject.Find("Main Camera");
 
-        player.transform.rotation = camera.transform.rotation;
-
         /*  Should probaby remove this and use the main camera.orientation?
         // let's rotate the camera.
         if (GvrController.IsTouching)
@@ -95,6 +93,14 @@ public class ImransFirstSceneScript : MonoBehaviour
         {
             // let's translate the camera forward
             player.transform.position += (camera.transform.rotation * Vector3.forward * Time.deltaTime) * m_forwardSpeed; // using deltatime means I'm moving at 1 meter/s
+
+            // and keep the world canvas in scene.
+            var mainTextCanvas = GameObject.Find("mainTextCanvas");
+            var controllerPointer = GameObject.Find("GvrControllerPointer");
+
+            mainTextCanvas.transform.position = controllerPointer.transform.position;
+            mainTextCanvas.transform.position += (GvrController.Orientation * Vector3.forward) * 3;
+            mainTextCanvas.transform.rotation = GvrController.Orientation;
         }
     }
 
